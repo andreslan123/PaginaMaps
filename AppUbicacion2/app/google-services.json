@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "204277700533",
+    "firebase_url": "https://mapa-en-tiempo-real-default-rtdb.firebaseio.com",
+    "project_id": "mapa-en-tiempo-real",
+    "storage_bucket": "mapa-en-tiempo-real.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:204277700533:android:c41af1c29fb6999eb1abfc",
+        "android_client_info": {
+          "package_name": "com.example.miubicacionapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAupVDcnPCbnIYHLh-JIJtwI-jJOZyYsdU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:204277700533:android:bf9946a7b93c12adb1abfc",
+        "android_client_info": {
+          "package_name": "com.miMapa.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAupVDcnPCbnIYHLh-JIJtwI-jJOZyYsdU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
