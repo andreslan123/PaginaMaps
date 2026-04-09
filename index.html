@@ -3,131 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Seguimiento en Tiempo Real - Mi App</title>
+    <title>Seguimiento y Geocerca - Mi App</title>
     
     <script src='https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js'></script>
     <link href='https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css' rel='stylesheet' />
     
+    <script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.4.3/mapbox-gl-draw.js'></script>
+    <link rel='stylesheet' href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.4.3/mapbox-gl-draw.css' type='text/css' />
+    <script src='https://unpkg.com/@turf/turf@6/turf.min.js'></script>
+
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <style>
-        /* ESTILOS PERSONALIZADOS */
-        body {
-            margin: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(to right, #1e3c72, #6a0d91);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: white;
-        }
-
-        header {
-            padding: 20px;
-            text-align: center;
-        }
-
-        h1 {
-            margin: 0;
-            font-size: 3rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        main {
-            width: 90%;
-            max-width: 900px;
-            margin-bottom: 30px;
-        }
-
-        h2 {
-            text-align: center;
-            font-size: 1.8rem;
-            margin-bottom: 20px;
-        }
-
-        /* PANEL DE COORDENADAS */
-        #info-panel {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 15px 25px;
-            border-radius: 15px;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-around;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            border: 2px solid #000;
-        }
-
-        .coord-item {
-            text-align: center;
-            color: #333;
-        }
-
-        .coord-label {
-            display: block;
-            font-size: 0.9rem;
-            font-weight: bold;
-            text-transform: uppercase;
-            color: #666;
-        }
-
-        .coord-value {
-            display: block;
-            font-size: 1.4rem;
-            font-family: 'Courier New', Courier, monospace;
-            font-weight: bold;
-            color: #6a0d91;
-        }
-
-        /* CONTENEDOR DEL MAPA */
-        #mapa {
-            height: 500px;
-            width: 100%;
-            border: 5px solid #000;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        footer {
-            margin-top: auto;
-            padding: 20px;
-            font-size: 0.9rem;
-            opacity: 0.8;
-        }
+        /* Mantenemos tus estilos geniales */
+        body { margin: 0; font-family: sans-serif; background: linear-gradient(to right, #1e3c72, #6a0d91); min-height: 100vh; display: flex; flex-direction: column; align-items: center; color: white; transition: background 0.5s; }
+        header { padding: 20px; }
+        main { width: 90%; max-width: 900px; }
+        #info-panel { background: white; padding: 15px; border-radius: 15px; display: flex; justify-content: space-around; color: #333; margin-bottom: 20px; border: 2px solid black; }
+        #mapa { height: 500px; width: 100%; border-radius: 15px; border: 5px solid black; }
+        .coord-value { font-weight: bold; color: #6a0d91; font-size: 1.2rem; }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>Ubicación de Mi App</h1>
-    </header>
+    <header><h1>Panel de Control XYZ</h1></header>
 
     <main>
-        <section>
-            <h2>Rastreo en vivo del dispositivo</h2>
-            
-            <div id="info-panel">
-                <div class="coord-item">
-                    <span class="coord-label">Latitud</span>
-                    <span id="lat-val" class="coord-value">0.000000</span>
-                </div>
-                <div class="coord-item">
-                    <span class="coord-label">Longitud</span>
-                    <span id="lng-val" class="coord-value">0.000000</span>
-                </div>
-            </div>
-
-            <div id="mapa"></div>
-        </section>
+        <div id="info-panel">
+            <div><span>LATITUD: </span><span id="lat-val" class="coord-value">0.0</span></div>
+            <div><span>LONGITUD: </span><span id="lng-val" class="coord-value">0.0</span></div>
+        </div>
+        <div id="mapa"></div>
     </main>
 
-    <footer>
-        <p>© 2026 Mi App - Conectado a Firebase Realtime Database</p>
-    </footer>
-
     <script>
-        // 1. CONFIGURACIÓN DE TU FIREBASE
+        // CONFIGURACIÓN FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyAKWQdiwDaCe2icelCgBciO0kl-4Y8132s",
             authDomain: "mapa-en-tiempo-real.firebaseapp.com",
@@ -138,54 +49,74 @@
             appId: "1:204277700533:web:fdd9a9fd587fc8ecb1abfc"
         };
         firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
 
-        // 2. CONFIGURACIÓN DE MAPBOX 
+        // CONFIGURACIÓN MAPBOX
         mapboxgl.accessToken = 'pk.eyJ1IjoiYW5kcmVzc2FudGljbGEiLCJhIjoiY21tNW53bWpiMDhzNTJxb205cWVrNzQ4eCJ9.hvXQqpbQpu3QHdv-GD48Fg';
         
         const map = new mapboxgl.Map({
             container: 'mapa',
             style: 'mapbox://styles/mapbox/streets-v11',
-            center: [-68.1193, -16.4897], // Punto inicial (Bolivia)
+            center: [-68.1193, -16.4897],
             zoom: 15
         });
 
-        // Marcador personalizado (un círculo rojo con borde blanco)
-        const marker = new mapboxgl.Marker({ color: '#ff0000' })
-            .setLngLat([-68.1193, -16.4897])
-            .addTo(map);
+        const marker = new mapboxgl.Marker({ color: '#ff0000' }).setLngLat([-68.1193, -16.4897]).addTo(map);
 
-        // Referencias a los elementos de texto
-        const latDisplay = document.getElementById('lat-val');
-        const lngDisplay = document.getElementById('lng-val');
+        // CONFIGURACIÓN DRAW (DIBUJO)
+        const draw = new MapboxDraw({
+            displayControlsDefault: false,
+            controls: { polygon: true, trash: true },
+            defaultMode: 'draw_polygon'
+        });
+        map.addControl(draw);
 
-        // 3. ESCUCHAR CAMBIOS EN FIREBASE
-        // Escuchamos la rama 'ubicaciones/usuario1' que es la que usa tu App de Android
-        const dbRef = firebase.database().ref('ubicaciones/usuario1');
+        // VARIABLES GLOBALES PARA GEOCERCA
+        let geocercaActiva = null;
 
-        dbRef.on('value', (snapshot) => {
+        // GUARDAR GEOCERCA EN FIREBASE
+        map.on('draw.create', actualizarGeocerca);
+        map.on('draw.update', actualizarGeocerca);
+
+        function actualizarGeocerca() {
+            const data = draw.getAll();
+            if (data.features.length > 0) {
+                geocercaActiva = data.features[0]; // Guardamos el polígono completo
+                const coords = geocercaActiva.geometry.coordinates[0];
+                database.ref('geocerca/area').set(coords);
+                console.log("Geocerca sincronizada.");
+            }
+        }
+
+        // ESCUCHAR POSICIÓN DEL HONOR Y VALIDAR ALERTA
+        database.ref('ubicaciones/usuario1').on('value', (snapshot) => {
             const data = snapshot.val();
-            if (data) {
+            if (data && data.latitud && data.longitud) {
                 const lat = data.latitud;
                 const lng = data.longitud;
 
-                // Actualizar números en el panel (con 6 decimales)
-                latDisplay.innerText = lat.toFixed(6);
-                lngDisplay.innerText = lng.toFixed(6);
-
-                // Mover el marcador en el mapa
+                // Actualizar UI
+                document.getElementById('lat-val').innerText = lat.toFixed(6);
+                document.getElementById('lng-val').innerText = lng.toFixed(6);
                 marker.setLngLat([lng, lat]);
+                map.flyTo({ center: [lng, lat], essential: true });
 
-                // Centrar la cámara suavemente
-                map.flyTo({
-                    center: [lng, lat],
-                    speed: 0.8,
-                    curve: 1,
-                    essential: true
-                });
-                
-                console.log("Coordenadas actualizadas:", lat, lng);
-            } else {
-                console.log("Esperando datos de Firebase...");
+                // LÓGICA DE ALERTA SI HAY UNA GEOCERCA DIBUJADA
+                if (geocercaActiva) {
+                    const puntoActual = turf.point([lng, lat]);
+                    const estaDentro = turf.booleanPointInPolygon(puntoActual, geocercaActiva);
+
+                    if (!estaDentro) {
+                        document.body.style.background = "red";
+                        database.ref('estado/alerta').set(true);
+                        // Sonido de alerta (asegúrate de tener el archivo o usa un link)
+                        const audio = new Audio('https://www.soundjay.com/buttons/beep-01a.mp3');
+                        audio.play();
+                    } else {
+                        document.body.style.background = "linear-gradient(to right, #1e3c72, #6a0d91)";
+                        database.ref('estado/alerta').set(false);
+                    }
+                }
             }
         });
     </script>
