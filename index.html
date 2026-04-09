@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Control Geocerca - Andres</title>
+    
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css' rel='stylesheet' />
+    <script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.4.3/mapbox-gl-draw.js'></script>
+    <link rel='stylesheet' href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.4.3/mapbox-gl-draw.css' type='text/css' />
+    <script src='https://unpkg.com/@turf/turf@6/turf.min.js'></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+    <style>
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: #1a1a2e; color: white; transition: background 0.5s; display: flex; flex-direction: column; align-items: center; }
+        #info-panel { background: white; padding: 15px; border-radius: 10px; display: flex; gap: 20px; color: #333; margin: 20px; border: 3px solid #6a0d91; }
+        #mapa { height: 500px; width: 90%; border-radius: 15px; border: 4px solid #000; }
+        .val { font-weight: bold; color: #6a0d91; }
+    </style>
+</head>
+<body>
+
+    <header><h1>Seguimiento Honor en Tiempo Real</h1></header>
+
+    <div id="info-panel">
+        <div>LAT: <span id="lat-val" class="val">0.0</span></div>
+        <div>LNG: <span id="lng-val" class="val">0.0</span></div>
+    </div>
+
+    <div id="mapa"></div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAKWQdiwDaCe2icelCgBciO0kl-4Y8132s",
+            authDomain: "mapa-en-tiempo-real.firebaseapp.com",
+            databaseURL: "https://mapa-en-tiempo-real-default-rtdb.firebaseio.com",
+            projectId: "mapa-en-tiempo-real",
+            storageBucket: "mapa-en-tiempo-real.firebasestorage.app",
+            messagingSenderId: "204277700533",
+            appId: "1:204277700533:web:fdd9a9fd587fc8ecb1abfc"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        mapboxgl.accessToken = 'pk.eyJ1IjoiYW5kcmVzc2FudGljbGEiLCJhIjoiY21tNW53bWpiMDhzNTJxb205cWVrNzQ4eCJ9.hvXQqpbQpu3QHdv-GD48Fg';
+        const map = new mapboxgl.Map({
+            container: 'mapa',
+            style: 'mapbox://styles/mapbox/streets-v11',
+            center: [-68.1193, -16.4897],
+            zoom: 15
+        });
+
+        const marker = new mapboxgl.Marker({ color: 'red' }).setLngLat([-68.1193, -16.4897]).addTo(map);
+
+        const draw = new MapboxDraw({
+            displayControlsDefault: false,
+            controls: { polygon: true, trash: true }
+        });
+        map.addControl(draw);
+
+        let geocercaActiva = null;
+
+        // Guardar Geocerca
+        map.on('draw.create', (e) => {
+            geocercaActiva = e.features[0];
+            database.ref('geocerca/area').set(geocercaActiva.geometry.coordinates[0]);
+        });
+
+        // Escuchar al celular
+        database.ref('ubicaciones/usuario1').on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                const lat = data.latitud;
+                const lng = data.longitud;
+
+                document.getElementById('lat-val').innerText = lat.toFixed(6);
+                document.getElementById('lng-val').innerText = lng.toFixed(6);
+                
+                marker.setLngLat([lng, lat]);
+                map.flyTo({ center: [lng, lat], essential: true });
+
+                if (geocercaActiva) {
+                    const pt = turf.point([lng, lat]);
+                    const dentro = turf.booleanPointInPolygon(pt, geocercaActiva);
+                    
+                    if (!dentro) {
+                        document.body.style.background = "red";
+                        database.ref('estado/alerta').set(true);
+                        new Audio('https://www.soundjay.com/buttons/beep-01a.mp3').play();
+                    } else {
+                        document.body.style.background = "#1a1a2e";
+                        database.ref('estado/alerta').set(false);
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
