@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<<<<<<< HEAD
     <title>Panel Control Geocerca - Andres</title>
     
     <script src='https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js'></script>
@@ -11,64 +10,61 @@
     <script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.4.3/mapbox-gl-draw.js'></script>
     <link rel='stylesheet' href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.4.3/mapbox-gl-draw.css' type='text/css' />
     <script src='https://unpkg.com/@turf/turf@6/turf.min.js'></script>
-=======
-    <title>Seguimiento y Geocerca - Mi App</title>
-    
-    <script src='https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js'></script>
-    <link href='https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css' rel='stylesheet' />
-    
-    <script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.4.3/mapbox-gl-draw.js'></script>
-    <link rel='stylesheet' href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.4.3/mapbox-gl-draw.css' type='text/css' />
-    <script src='https://unpkg.com/@turf/turf@6/turf.min.js'></script>
 
->>>>>>> 519863f09e045cd16a2e49267040f1714673e938
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <style>
-<<<<<<< HEAD
-        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: #1a1a2e; color: white; transition: background 0.5s; display: flex; flex-direction: column; align-items: center; }
-        #info-panel { background: white; padding: 15px; border-radius: 10px; display: flex; gap: 20px; color: #333; margin: 20px; border: 3px solid #6a0d91; }
-        #mapa { height: 500px; width: 90%; border-radius: 15px; border: 4px solid #000; }
-        .val { font-weight: bold; color: #6a0d91; }
-=======
-        /* Mantenemos tus estilos geniales */
-        body { margin: 0; font-family: sans-serif; background: linear-gradient(to right, #1e3c72, #6a0d91); min-height: 100vh; display: flex; flex-direction: column; align-items: center; color: white; transition: background 0.5s; }
-        header { padding: 20px; }
-        main { width: 90%; max-width: 900px; }
-        #info-panel { background: white; padding: 15px; border-radius: 15px; display: flex; justify-content: space-around; color: #333; margin-bottom: 20px; border: 2px solid black; }
-        #mapa { height: 500px; width: 100%; border-radius: 15px; border: 5px solid black; }
-        .coord-value { font-weight: bold; color: #6a0d91; font-size: 1.2rem; }
->>>>>>> 519863f09e045cd16a2e49267040f1714673e938
+        body { 
+            margin: 0; 
+            font-family: 'Segoe UI', sans-serif; 
+            background: #1a1a2e; 
+            color: white; 
+            transition: background 0.5s; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            min-height: 100vh;
+        }
+        header { padding: 20px; text-align: center; }
+        #info-panel { 
+            background: white; 
+            padding: 15px; 
+            border-radius: 10px; 
+            display: flex; 
+            gap: 20px; 
+            color: #333; 
+            margin: 20px; 
+            border: 3px solid #6a0d91; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        #mapa { 
+            height: 500px; 
+            width: 90%; 
+            max-width: 1000px;
+            border-radius: 15px; 
+            border: 4px solid #000; 
+        }
+        .val { font-weight: bold; color: #6a0d91; font-size: 1.2rem; }
+        h1 { margin: 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
     </style>
 </head>
 <body>
 
-<<<<<<< HEAD
-    <header><h1>Seguimiento Honor en Tiempo Real</h1></header>
+    <header>
+        <h1>Seguimiento Honor en Tiempo Real</h1>
+        <p>Dibuja un polígono en el mapa para activar la geocerca</p>
+    </header>
 
     <div id="info-panel">
-        <div>LAT: <span id="lat-val" class="val">0.0</span></div>
-        <div>LNG: <span id="lng-val" class="val">0.0</span></div>
+        <div>LATITUD: <span id="lat-val" class="val">0.000000</span></div>
+        <div>LONGITUD: <span id="lng-val" class="val">0.000000</span></div>
     </div>
 
     <div id="mapa"></div>
 
     <script>
-=======
-    <header><h1>Panel de Control XYZ</h1></header>
-
-    <main>
-        <div id="info-panel">
-            <div><span>LATITUD: </span><span id="lat-val" class="coord-value">0.0</span></div>
-            <div><span>LONGITUD: </span><span id="lng-val" class="coord-value">0.0</span></div>
-        </div>
-        <div id="mapa"></div>
-    </main>
-
-    <script>
-        // CONFIGURACIÓN FIREBASE
->>>>>>> 519863f09e045cd16a2e49267040f1714673e938
+        // 1. CONFIGURACIÓN FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyAKWQdiwDaCe2icelCgBciO0kl-4Y8132s",
             authDomain: "mapa-en-tiempo-real.firebaseapp.com",
@@ -81,13 +77,9 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-<<<<<<< HEAD
-        mapboxgl.accessToken = 'pk.eyJ1IjoiYW5kcmVzc2FudGljbGEiLCJhIjoiY21tNW53bWpiMDhzNTJxb205cWVrNzQ4eCJ9.hvXQqpbQpu3QHdv-GD48Fg';
-=======
-        // CONFIGURACIÓN MAPBOX
+        // 2. CONFIGURACIÓN MAPBOX
         mapboxgl.accessToken = 'pk.eyJ1IjoiYW5kcmVzc2FudGljbGEiLCJhIjoiY21tNW53bWpiMDhzNTJxb205cWVrNzQ4eCJ9.hvXQqpbQpu3QHdv-GD48Fg';
         
->>>>>>> 519863f09e045cd16a2e49267040f1714673e938
         const map = new mapboxgl.Map({
             container: 'mapa',
             style: 'mapbox://styles/mapbox/streets-v11',
@@ -95,9 +87,10 @@
             zoom: 15
         });
 
-<<<<<<< HEAD
+        // Marcador del celular
         const marker = new mapboxgl.Marker({ color: 'red' }).setLngLat([-68.1193, -16.4897]).addTo(map);
 
+        // Herramientas de dibujo
         const draw = new MapboxDraw({
             displayControlsDefault: false,
             controls: { polygon: true, trash: true }
@@ -106,90 +99,55 @@
 
         let geocercaActiva = null;
 
-        // Guardar Geocerca
-        map.on('draw.create', (e) => {
-            geocercaActiva = e.features[0];
-            database.ref('geocerca/area').set(geocercaActiva.geometry.coordinates[0]);
-        });
+        // 3. EVENTOS DE DIBUJO
+        function actualizarGeocerca(e) {
+            const data = draw.getAll();
+            if (data.features.length > 0) {
+                geocercaActiva = data.features[0];
+                // Guardar coordenadas en Firebase para referencia (opcional)
+                database.ref('geocerca/area').set(geocercaActiva.geometry.coordinates[0]);
+            } else {
+                geocercaActiva = null;
+                database.ref('estado/alerta').set(false);
+                document.body.style.background = "#1a1a2e";
+            }
+        }
 
-        // Escuchar al celular
+        map.on('draw.create', actualizarGeocerca);
+        map.on('draw.update', actualizarGeocerca);
+        map.on('draw.delete', actualizarGeocerca);
+
+        // 4. ESCUCHAR AL CELULAR (FIREBASE)
         database.ref('ubicaciones/usuario1').on('value', (snapshot) => {
             const data = snapshot.val();
             if (data) {
                 const lat = data.latitud;
                 const lng = data.longitud;
 
+                // Actualizar números en pantalla
                 document.getElementById('lat-val').innerText = lat.toFixed(6);
                 document.getElementById('lng-val').innerText = lng.toFixed(6);
                 
+                // Mover marcador y cámara
                 marker.setLngLat([lng, lat]);
                 map.flyTo({ center: [lng, lat], essential: true });
 
+                // 5. LÓGICA DE GEOCERCA (TURF.JS)
                 if (geocercaActiva) {
                     const pt = turf.point([lng, lat]);
                     const dentro = turf.booleanPointInPolygon(pt, geocercaActiva);
                     
                     if (!dentro) {
-                        document.body.style.background = "red";
+                        // FUERA DE LA GEOCERCA
+                        document.body.style.background = "#8B0000"; // Rojo oscuro
                         database.ref('estado/alerta').set(true);
-                        new Audio('https://www.soundjay.com/buttons/beep-01a.mp3').play();
-                    } else {
-                        document.body.style.background = "#1a1a2e";
-=======
-        const marker = new mapboxgl.Marker({ color: '#ff0000' }).setLngLat([-68.1193, -16.4897]).addTo(map);
-
-        // CONFIGURACIÓN DRAW (DIBUJO)
-        const draw = new MapboxDraw({
-            displayControlsDefault: false,
-            controls: { polygon: true, trash: true },
-            defaultMode: 'draw_polygon'
-        });
-        map.addControl(draw);
-
-        // VARIABLES GLOBALES PARA GEOCERCA
-        let geocercaActiva = null;
-
-        // GUARDAR GEOCERCA EN FIREBASE
-        map.on('draw.create', actualizarGeocerca);
-        map.on('draw.update', actualizarGeocerca);
-
-        function actualizarGeocerca() {
-            const data = draw.getAll();
-            if (data.features.length > 0) {
-                geocercaActiva = data.features[0]; // Guardamos el polígono completo
-                const coords = geocercaActiva.geometry.coordinates[0];
-                database.ref('geocerca/area').set(coords);
-                console.log("Geocerca sincronizada.");
-            }
-        }
-
-        // ESCUCHAR POSICIÓN DEL HONOR Y VALIDAR ALERTA
-        database.ref('ubicaciones/usuario1').on('value', (snapshot) => {
-            const data = snapshot.val();
-            if (data && data.latitud && data.longitud) {
-                const lat = data.latitud;
-                const lng = data.longitud;
-
-                // Actualizar UI
-                document.getElementById('lat-val').innerText = lat.toFixed(6);
-                document.getElementById('lng-val').innerText = lng.toFixed(6);
-                marker.setLngLat([lng, lat]);
-                map.flyTo({ center: [lng, lat], essential: true });
-
-                // LÓGICA DE ALERTA SI HAY UNA GEOCERCA DIBUJADA
-                if (geocercaActiva) {
-                    const puntoActual = turf.point([lng, lat]);
-                    const estaDentro = turf.booleanPointInPolygon(puntoActual, geocercaActiva);
-
-                    if (!estaDentro) {
-                        document.body.style.background = "red";
-                        database.ref('estado/alerta').set(true);
-                        // Sonido de alerta (asegúrate de tener el archivo o usa un link)
+                        
+                        // Intentar sonar alerta (el navegador puede bloquearlo si no has hecho click)
                         const audio = new Audio('https://www.soundjay.com/buttons/beep-01a.mp3');
-                        audio.play();
+                        audio.play().catch(e => console.log("Audio bloqueado hasta interacción"));
                     } else {
-                        document.body.style.background = "linear-gradient(to right, #1e3c72, #6a0d91)";
->>>>>>> 519863f09e045cd16a2e49267040f1714673e938
+                        // DENTRO DE LA GEOCERCA
+                        document.body.style.background = "#1a1a2e"; // Color original
                         database.ref('estado/alerta').set(false);
                     }
                 }

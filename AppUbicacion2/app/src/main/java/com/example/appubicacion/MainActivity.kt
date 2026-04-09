@@ -3,6 +3,7 @@ package com.example.appubicacion
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.os.VibrationEffect
 import android.os.Vibrator
@@ -11,7 +12,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.example.miubicacionapp.R
+import com.example.appubicacion.databinding.ActivityMainBinding
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.database.*
 import com.mapbox.maps.CameraOptions
@@ -22,11 +23,12 @@ import com.mapbox.maps.plugin.locationcomponent.location
 
 class MainActivity : AppCompatActivity() {
 
+    // 1. DECLARACIÓN DEL BINDING
+    private lateinit var binding: ActivityMainBinding
     private lateinit var mapView: MapView
     private lateinit var txtCoordenadas: TextView
     private lateinit var btnCentrar: FloatingActionButton
 
-    // Referencia base a Firebase
     private val database = FirebaseDatabase.getInstance().reference
 
     private val requestPermissionLauncher = registerForActivityResult(
@@ -37,15 +39,19 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
 
-        mapView = findViewById(R.id.mapView)
-        txtCoordenadas = findViewById(R.id.txtCoordenadas)
-        btnCentrar = findViewById(R.id.btnCentrar)
+        // 2. INICIALIZACIÓN CORRECTA (Sin el setContentView viejo)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        // 3. ASIGNACIÓN MEDIANTE BINDING
+        mapView = binding.mapView
+        txtCoordenadas = binding.txtCoordenadas
+        btnCentrar = binding.btnCentrar
 
         mapView.mapboxMap.loadStyle(Style.MAPBOX_STREETS) {
             checkPermissions()
-            configurarAlertaRemota()
+           configurarAlertaRemota()
         }
 
         btnCentrar.setOnClickListener {
@@ -60,18 +66,24 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun configurarAlertaRemota() {
-        // Escucha si la web cambia el estado a true
         database.child("estado").child("alerta").addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val alertaActiva = snapshot.getValue(Boolean::class.java) ?: false
                 if (alertaActiva) {
                     val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                    vibrator.vibrate(VibrationEffect.createOneShot(1000, VibrationEffect.DEFAULT_AMPLITUDE))
+                    // Vibración segura para versiones nuevas y viejas
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        vibrator.vibrate(VibrationEffect.createOneShot(1000, VibrationEffect.DEFAULT_AMPLITUDE))
+                    } else {
+                        vibrator.vibrate(1000)
+                    }
                     Toast.makeText(this@MainActivity, "¡ALERTA: Fuera de la geocerca!", Toast.LENGTH_LONG).show()
                 }
             }
             override fun onCancelled(error: DatabaseError) {}
         })
+
+
     }
 
     private fun checkPermissions() {
@@ -96,7 +108,6 @@ class MainActivity : AppCompatActivity() {
                     "longitud" to lng,
                     "timestamp" to System.currentTimeMillis()
                 )
-                // Enviamos a la ruta exacta: ubicaciones/usuario1
                 database.child("ubicaciones").child("usuario1").setValue(datos)
             }
         }
